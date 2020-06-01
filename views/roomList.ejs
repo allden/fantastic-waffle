@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <%- include('partials/head'); %>
+        <title>Room List</title>
+    </head>
+    <body>
+        <%- include('partials/nav'); %>
+        <h1>List of Rooms</h1>
+        <ul>
+            <% rooms.forEach(room => { %>
+                <li><a href="/room/<%=room.title%>"><%=room.title%></a></li>
+            <% }); %>
+        </ul>
+        <p>Don't like any of these? <a href="/room">Create your own.</a></p>
+    </body>
+</html>

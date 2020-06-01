@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <%- include('partials/head'); %>
+        <title>Sanity Check</title>
+    </head>
+    <body>
+        <%- include('partials/nav'); %>
+        <%- include('partials/messages'); %>
+        <h1><%= user ? `Welcome, ${user.username}` : 'Welcome!'%></h1>
+        <p>This website is for websocket testing purposes.</p>
+    </body>
+</html>

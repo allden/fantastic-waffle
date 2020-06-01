@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <%- include('partials/head'); %>
+        <title>Meet People</title>
+        <style>
+            * {
+                padding: 0;
+                margin: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                height: 80vh;
+            }
+
+            #container {
+                display: flex;
+                flex-direction: row;
+                height: 100%;
+            }
+            
+            #messages {
+                height: 70%;
+                overflow: auto;
+            }
+
+            #chat {
+                width: 50%;
+            }
+
+            #people-list {
+                width: 50%;
+            }
+
+            #message-form, #message-input, button {
+                width: 100%;
+            }
+
+            ul {
+                margin-left: 1rem;
+            }
+
+            .person {
+                padding: 1rem;
+                margin-bottom: 1rem;
+                background: #ccc;
+                color: #333;
+                cursor: pointer;
+                transition: background .5s;
+            }
+
+            .person:hover {
+                background: #333;
+                color: #ccc;
+            }
+
+            #people-list {
+                overflow: auto;
+            }
+
+            #active-conversations {
+                display: flex;
+                list-style: none;
+            }
+
+            #current {
+                background: #333;
+                color: #ccc;
+            }
+
+            .active-conversation {
+                background: #ccc;
+                color: #333;
+                padding: .5rem;
+                min-width: 60px;
+                text-align: center;
+                cursor: pointer;
+            }
+
+            .new {
+                background: coral;
+            }
+        </style>
+    </head>
+    <body>
+        <%- include('partials/nav'); %>
+        <h1>Meet People</h1>
+        <div id="container">
+            <div id="chat">
+                <div id="chat-list">
+                    <ul id="active-conversations">
+                    </ul>
+                </div>
+                <div id="messages">
+    
+                </div>
+                <form id="message-form">
+                    <textarea id="message-input" placeholder="type in your message" required></textarea>
+                    <button>Send</button>
+                </form>
+            </div>
+            <div id="people-list">
+                <% users.forEach(person => { %>
+                    <div class="person">
+                        <ul>
+                            <li><%=person.username%></li>
+                            <% if(person.age) { %>
+                                <li><%=person.age%></li>
+                            <% }; %>
+                            <% if(person.gender) { %>
+                                <li><%=person.gender%></li>
+                            <% }; %>
+                            <% if(person.location) { %>
+                                <li><%=person.location%></li>
+                            <% }; %>
+                        </ul>
+                        <p><%=person.about ? person.about : ''%></p>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+        <script src="/socket.io/socket.io.js"></script>
+        <% if(user) { %>
+            <script>
+                // message window
+                const messages = document.getElementById('messages');
+                // the div that represents the selected conversation
+                const currentUser = "<%=user.username%>";
+                // list of currently active conversations
+                const activeConversations = document.getElementById('active-conversations');
+
+                const socket = io();
+                socket.on('connect', () => {
+                    // what i will be pushing to my server in my users object
+                    const userInfo = {
+                        username: currentUser,
+                        socket: socket.io.engine.id
+                    };
+                    // this emits the event with the user info in order for me to keep track of which user has which socket
+                    socket.emit('connectMeetPeople', userInfo);
+                });
+
+                socket.on('connectMeetPeople', unreads => {
+                    // whenever the user connects to meet people, they will get a list of all of their active conversations as a response from the server
+                    populateActiveConversations(unreads);
+                });
+
+                socket.on('privateMessage', msg => {
+                    const currentChat = document.getElementById('current');
+                    // if the message is from the currently selected user (#current div) or the user that sent it, then we want to display
+                    // the message.
+                    if(msg.sender.username === currentChat.textContent || msg.sender.username === currentUser) {
+                        appendMessage(msg);
+                        scrollToBottom(messages);
+                    };
+
+                    /* if the message event is sent by the selected user or the current user, we want the message to display on the screen v
+                    but what if it's from another user? v 
+                    there is one goal - we want the current user to know that they received a message even if they are offline v
+                    this can be accomplished by adding a read boolean on every privateInstance v
+                    the moment the user enters the page or a private message is sent to them, we want to provide them with all privateInstances that are associated with them and have read set to false
+                    alternatively if the user is already on the page, their active conversations will be represented by divs,
+                    on each private message we will check if there is a div that exists that represents the sender, if it does give it a class of "new", if it doesn't, create it and then give it a class of "new"
+                    on opening, the "new" class will be removed. */
+                });
+
+                // whenever a user clicks on a conversation, they will get a list of all messages with that specific user
+                socket.on('privateMessageHistory', msgArr => {
+                    if(msgArr) {
+                        msgArr.forEach(msg => {
+                            appendMessage(msg);
+                        });
+                    };
+                    scrollToBottom(messages);
+                });
+
+                function removeCurrentFromAll() {
+                    let currentlySelected = document.getElementById('current');
+                    if(currentlySelected) {
+                        currentlySelected.removeAttribute('id');
+                    };
+                };
+
+                // this controls the events for every person in the list of people available
+                function addPersonEvents() {
+                    const persons = document.getElementsByClassName('person');
+                    for(person of persons) {
+                        person.addEventListener('click', personEvent);
+                    };
+                };
+
+                // this is the actual event for the "person" class, which returns the message history with the selected user
+                function personEvent(e) {
+                    const targetChildren = e.currentTarget.children;
+                    const info = targetChildren[0].children;
+                    const selectedUser = info[0].textContent;
+
+                    // remove the "current" id from the holder element
+                    removeCurrentFromAll();
+
+                    // create a block in the UI with the "current" id
+                    createActiveConversationBlock(selectedUser, true);
+
+                    // generate message history
+                    requestMessageHistory(selectedUser);
+                };
+
+
+                // the event responsible for requesting the messaging history for the selected user
+                function requestMessageHistory(to) {
+                    const privateMessageInfo = {
+                        from: "<%=user._id%>",
+                        to
+                    };
+                    
+                    socket.emit('privateMessageHistory', privateMessageInfo);
+                    messages.innerHTML='';
+                    setFormState();
+                };
+
+                // adds the event for the message form
+                function addFormEvent() {
+                    const form = document.getElementById('message-form');
+
+                    form.addEventListener('submit', formSubmitEvent);
+                };
+
+                // the actual event that will be triggered by the message form, in this case it controls 
+                function formSubmitEvent(e) {
+                    e.preventDefault();
+                    const selectedUser = document.getElementById('current').textContent;
+                    const message = document.getElementById('message-input').value;
+
+                    if(selectedUser !== '' && message !== '') {
+                        const messageInfo = {
+                            from: "<%=user._id%>",
+                            to: selectedUser,
+                            message
+                        };
+
+                        console.log(messageInfo);
+
+                        socket.emit('privateMessage', messageInfo);
+                    };
+                };
+
+                function setFormState() {
+                    const currentChat = document.getElementById('current');
+                    const selectedUser = currentChat ? currentChat.textContent : '';
+                    const messageInput = document.getElementById('message-input');
+                    if(!selectedUser) {
+                        messageInput.disabled = true;
+                    } else {
+                        messageInput.disabled = false;
+                    };
+                };
+
+                function formatMessage(msg) {
+                    // this is what will represent the message in the UI
+                    const messageDiv = document.createElement('div');
+                    const userHeader = document.createElement('h3');
+                    const datePara = document.createElement('p');
+                    const contentPara = document.createElement('p');
+
+                    // the msg object is what we get from our db
+                    const userTextNode = document.createTextNode(msg.sender.username);
+                    const dateTextNode = document.createTextNode(msg.date);
+                    const contentTextNode = document.createTextNode(msg.content);
+
+                    userHeader.appendChild(userTextNode);
+                    datePara.appendChild(dateTextNode);
+                    contentPara.appendChild(contentTextNode);
+
+                    messageDiv.appendChild(userHeader);
+                    messageDiv.appendChild(datePara);
+                    messageDiv.appendChild(contentPara);
+
+                    return messageDiv;
+                };
+
+                // when a person initiates a conversation, it will be put in their active conversations list on top of the messaging window
+                function populateActiveConversations(conversations) {
+                    conversations.forEach(user => {
+                        createActiveConversationBlock(user);
+                    });
+                };
+
+                // generate active conversation div content to display in the UI
+                function createActiveConversationBlock(user, current=false) {
+
+                    // we have an array with every user that we currently hold an active conversation with
+                    if(checkIfActiveConversationBlockExists(user) === false) {
+                        const listElem = document.createElement('li');
+                        listElem.setAttribute('class', 'active-conversation new');
+    
+                        // if current parameter is true, then we want this to be the selected conversation. this will be used for the person card on-click event.
+                        if(current) {
+                            listElem.setAttribute('id', 'current');
+                        };
+    
+                        const content = document.createTextNode(user);
+                        listElem.appendChild(content);
+                        listElem.addEventListener('click', activeConversationEvent);
+                        activeConversations.appendChild(listElem);
+                    } else {
+                        setCurrentID(user);
+                    };
+                };
+
+                // this only executes when the user has clicked on a user for whom an active conversation already exists
+                // iterate over all active conversations and then append the "current" ID on the matching one
+                function setCurrentID(user) {
+                    let activeConversationsChildren = activeConversations.children;
+                    for(let child of activeConversationsChildren) {
+                        if(child.textContent === user) {
+                            child.setAttribute('id', 'current');
+                        };
+                    };
+
+                    // afterwards set form state to true because we now have a user selected
+                    setFormState();
+                };
+
+                function checkIfActiveConversationBlockExists(user) {
+                    let activeConversationsChildren = activeConversations.children;
+                    let flag = false;
+                    // check if a block for the user exists, if it does change flag to true, if it doesn't flag stays false
+                    for(let child of activeConversationsChildren) {
+                        if(child.textContent === user) {
+                            flag = true;
+                        };
+                    };
+
+                    // we will then use this boolean to decide if this user will be appended to the #active-conversations div.
+                    return flag
+                };
+
+                // this is what happens when a user clicks on one of the active conversation blocks
+                function activeConversationEvent(e) {
+                    const currentElement = e.target;
+                    const selectedUser = currentElement.textContent;
+                    // remove "current" id from holder element and then assign it to the just clicked one
+                    removeCurrentFromAll();
+                    currentElement.setAttribute('id', 'current');
+                    // reset the form state so it is now active, and then request the message history
+                    setFormState();
+                    requestMessageHistory(selectedUser);
+                };
+
+                // what happens on receiving and sending a message
+                function appendMessage(msg) {
+                    messages.appendChild(formatMessage(msg));
+                };
+
+                // this is here so that the chat will be scrolled to the bottom on every message so the user doesn't have to scroll manually
+                function scrollToBottom(elem) {
+                    elem.scrollTop = elem.scrollHeight;
+                };
+
+                addFormEvent();
+                addPersonEvents();
+                setFormState();
+            </script>
+        <% }; %>
+    </body>
+</html>
