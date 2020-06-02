@@ -5,6 +5,7 @@ const messageController = require('./messageController');
 module.exports.createPrivateInstance = (info) => {
     return User.findOne({username: info.to})
     .then(user => {
+        // info.from is already an ID, info.to needed to be converted
         const sender = info.from;
         const recipient = user._id;
 
@@ -20,7 +21,7 @@ module.exports.createPrivateInstance = (info) => {
             {users: {$eq: [sender, recipient]}},
             {users: {$eq: [recipient, sender]}}
         ]})
-        .then(async room => {
+        .then(room => {
             // sender is added here because this is what will be assigned to the message as "sender" once it is created
             const msgObj = {
                 msg: info.message,
@@ -29,12 +30,19 @@ module.exports.createPrivateInstance = (info) => {
 
             // if it already exists append message to old room
             if(room) {
-                return await messageController.createMessage(msgObj, room._id, appendMessage);
+                // update the room so that the recipient gets the notification
+                return PrivateInstance.findByIdAndUpdate({_id: room._id}, {$push: {unread: recipient}})
+                .then(async() => {
+                    return await messageController.createMessage(msgObj, room._id, appendMessage);
+                })
+                .catch(err => errHandling(err));
             };
 
             // if it doesn't create a new room and append the message to that one
             return new PrivateInstance({
-                users: [recipient, sender]
+                users: [recipient, sender],
+                // whenever a new instance is created, append the recipient to the unread array so they get a notification
+                unread: [recipient]
             })
             .save()
             .then(async newRoom => {
@@ -80,7 +88,12 @@ module.exports.getPrivateMessageHistory = (msgInfo) => {
         .then(found => {
             // if a conversation between the two users is found, append the messages, otherwise just return
             if(found) {
-                return found.messages;
+                // also make sure to pull the sender of the request from the unread array, as they've clearly seen the conversation
+                return PrivateInstance.findByIdAndUpdate({_id: found._id}, {$pull: {unread: sender}})
+                .then(() => {
+                    return found.messages;
+                })
+                .catch(err => errHandling(err));
             };
             
             return
@@ -93,7 +106,7 @@ module.exports.getPrivateMessageHistory = (msgInfo) => {
 module.exports.getAllUnreadConversations = (loggedInUser) => {
     return User.findOne({username: loggedInUser})
     .then(user => {
-        return PrivateInstance.find({users: user._id, unread: true})
+        return PrivateInstance.find({users: user._id, unread: user._id})
         .populate('users')
         .then(unread => {
             unreadUsers = [];

@@ -14,10 +14,10 @@ const PrivateInstanceModel = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Message'
     }],
-    unread: {
-        type: Boolean,
-        default: true
-    }
+    unread: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 });
 
 module.exports = mongoose.model('PrivateInstance', PrivateInstanceModel);

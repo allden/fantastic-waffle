@@ -9,7 +9,6 @@ module.exports = (io) => {
             console.log('disconnected');
             let filtered = users.filter(user => user.socket !== socket.id);
             users = [...filtered];
-            console.log(users);
         });
         
         let room = '';
@@ -46,8 +45,9 @@ module.exports = (io) => {
         socket.on('connectMeetPeople', async userInfo => {
             users.push(userInfo);
 
+            // this needs to be here so that we can get the username easily
             const unreadMessages = await privInstController.getAllUnreadConversations(userInfo.username).then(unreads => {
-                socket.emit('connectMeetPeople', unreads);
+                socket.emit('activeConversations', unreads);
             });
         });
 
@@ -57,15 +57,20 @@ module.exports = (io) => {
             const recipientSocket = recipient ? recipient.socket : '';
 
             // the data also contains the room because i need it in order to make a room
-            const data = await privInstController.createPrivateInstance(messageInfo).then(data => {
+            const data = await privInstController.createPrivateInstance(messageInfo).then(async data => {
                 const room = data.room;
                 const msg = data.msg;
                 
                 socket.join(room);
                 if(recipientSocket) {
                     io.sockets.connected[recipientSocket].join(room);
+
+                    // return all active conversations when a private message is sent to the logged in user
+                    const unreadMessages = await privInstController.getAllUnreadConversations(recipient.username);
+                    // whenever a private message is sent, we want to emit the user's current active conversations and also the message itself
+                    io.to(recipientSocket).emit('activeConversations', unreadMessages);
                 };
-    
+
                 io.to(room).emit('privateMessage', msg);
             });
             // check if room that contains both ids exists
