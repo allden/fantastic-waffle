@@ -30,7 +30,11 @@ const UserModel = new Schema({
     createdRooms: {
         type: Schema.Types.ObjectId,
         ref: 'PublicInstanceModel'
-    }
+    },
+    friendsList: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 });
 
 module.exports = mongoose.model('User', UserModel);

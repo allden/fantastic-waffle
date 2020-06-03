@@ -119,9 +119,22 @@ module.exports.updateSettings = (req, res) => {
 };
 
 module.exports.getUsers = (req, res) => {
-    User.find({})
+    return res.render('people');
+};
+
+module.exports.getUsersAsync = () => {
+    return User.find({})
     .then(users => {
-        res.render('people', {users})
+        return users
+    })
+    .catch(err => errHandling(err));
+};
+
+module.exports.getFriendsListAsync = (username) => {
+    return User.findOne({username})
+    .populate('friendsList')
+    .then(user => {
+        return user.friendsList
     })
     .catch(err => errHandling(err));
 };

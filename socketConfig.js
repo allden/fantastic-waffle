@@ -1,6 +1,7 @@
 const publInstController = require('./controllers/publicInstanceController');
 const msgController = require('./controllers/messageController');
 const privInstController = require('./controllers/privateInstanceController');
+const userController = require('./controllers/userController');
 
 module.exports = (io) => {
     let users = [];
@@ -85,6 +86,16 @@ module.exports = (io) => {
             const messages = await privInstController.getPrivateMessageHistory(messageInfo).then(msgArr => {
                 socket.emit('privateMessageHistory', msgArr);
             });
+        });
+
+        socket.on('requestFriends', async user => {
+            const friendsList = await userController.getFriendsListAsync(user);
+            socket.emit('requestFriends', friendsList);
+        });
+
+        socket.on('requestPeopleList', async () => {
+            const peopleList = await userController.getUsersAsync();
+            socket.emit('requestPeopleList', peopleList);
         });
     });
 };

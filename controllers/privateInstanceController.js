@@ -42,7 +42,7 @@ module.exports.createPrivateInstance = (info) => {
             return new PrivateInstance({
                 users: [recipient, sender],
                 // whenever a new instance is created, append the recipient to the unread array so they get a notification
-                unread: [recipient]
+                unread: [recipient, sender]
             })
             .save()
             .then(async newRoom => {

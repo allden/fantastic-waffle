@@ -34,6 +34,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 require('./passportConfig')();
 
+app.use(express.static('public'));
 // access to json and urlencoded
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
