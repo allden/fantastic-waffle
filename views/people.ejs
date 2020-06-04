@@ -4,82 +4,46 @@
         <%- include('partials/head'); %>
         <title>Meet People</title>
         <style>
-            * {
-                padding: 0;
-                margin: 0;
-                box-sizing: border-box;
-            }
-
-            body {
-                height: 100vh;
-            }
-
             #container {
                 display: flex;
                 flex-direction: row;
-                height: 100%;
-            }
-            
-            #messages {
-                height: 70%;
-                overflow: auto;
             }
 
-            #chat {
-                width: 50%;
-            }
-
-            #message-form, #message-input, button {
+            /* will be split later with bootstrap grid system */
+            #left, #right {
                 width: 100%;
             }
 
-            ul {
-                margin-left: 1rem;
-            }
-
-            .person {
-                padding: 1rem;
-                margin-bottom: 1rem;
-                background: #ccc;
-                color: #333;
-                cursor: pointer;
-                transition: background .5s;
-            }
-
-            .person:hover {
-                background: #333;
-                color: #ccc;
-            }
-
-            #people-list {
-                overflow: auto;
-            }
-
+            /* will also be handled with bootstrap */
             #active-conversations {
                 display: flex;
                 list-style: none;
             }
 
-            #current {
-                background: #333;
-                color: #ccc;
+            #active-conversations li {
+                padding: 1rem;
             }
 
-            .active-conversation {
-                background: #ccc;
-                color: #333;
-                padding: .5rem;
-                min-width: 60px;
-                text-align: center;
+
+            /* bootstrap btns */
+            .active-conversation, .person {
+                background: #ddd;
+            }
+
+            .active-conversation:hover, .person:hover {
+                background: #aaa;
                 cursor: pointer;
             }
 
-            .new {
-                background: coral;
+            /* current might need a unique class to make it apparent */
+            #current {
+                background: #333;
+                color: white;
             }
 
-            #people-navigation {
-                width: 50%;
+            /* this as well */
+            .new {
+                background: coral;
             }
         </style>
     </head>
@@ -87,23 +51,34 @@
         <%- include('partials/nav'); %>
         <h1>Meet People</h1>
         <div id="container">
-            <div id="chat">
-                <div id="chat-list">
-                    <ul id="active-conversations">
-                    </ul>
+            <audio>
+                <source src="/sfx/ding.wav" type="audio/wav">
+                Your browser does not support the audio file.
+            </audio>
+            <div id="left">
+                <div id="chat">
+                    <div id="chat-list">
+                        <ul id="active-conversations">
+                        </ul>
+                    </div>
+                    <div id="messages">
+        
+                    </div>
+                    <form id="message-form">
+                        <textarea id="message-input" placeholder="type in your message" required></textarea>
+                        <button>Send</button>
+                    </form>
                 </div>
-                <div id="messages">
-    
+                <div id="selected-profile">
+                    
                 </div>
-                <form id="message-form">
-                    <textarea id="message-input" placeholder="type in your message" required></textarea>
-                    <button>Send</button>
-                </form>
             </div>
-            <div id="people-navigation">
-                <button id="friends-btn">Friends</button>
-                <button id="meet-btn">Meet People</button>
-                <div id="people-list">
+            <div id="right">
+                <div id="people-navigation">
+                    <button id="friends-btn">Friends</button>
+                    <button id="meet-btn">Meet People</button>
+                    <div id="people-list">
+                    </div>
                 </div>
             </div>
         </div>

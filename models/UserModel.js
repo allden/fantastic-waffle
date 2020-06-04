@@ -34,7 +34,11 @@ const UserModel = new Schema({
     friendsList: [{
         type: Schema.Types.ObjectId,
         ref: 'User'
-    }]
+    }],
+    isOnline: {
+        type: Boolean,
+        default: false
+    }
 });
 
 module.exports = mongoose.model('User', UserModel);

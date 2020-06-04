@@ -139,6 +139,15 @@ module.exports.getFriendsListAsync = (username) => {
     .catch(err => errHandling(err));
 };
 
+module.exports.changeState = (username, state=false) => {
+    return User.findOneAndUpdate({username}, {isOnline: state})
+    .then(user => {
+        let strState = user.isOnline ? 'online' : 'offline';
+        return console.log(user.username, 'is now', strState);
+    })
+    .catch(err => errHandling(err));
+};
+
 function errHandling(err) {
     return console.error(err);
 };

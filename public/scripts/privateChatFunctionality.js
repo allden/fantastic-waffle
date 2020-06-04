@@ -8,6 +8,8 @@ const peopleList = document.getElementById('people-list');
 const friendsBtn = document.getElementById('friends-btn');
 // meet people btn
 const meetPeopleBtn = document.getElementById('meet-btn');
+// audio element
+const audio = document.querySelector('audio');
 
 // get friendsList based on username whenever you click on the "friends-btn" button
 friendsBtn.addEventListener('click', () => requestFriendsList(currentUserName));
@@ -16,28 +18,33 @@ meetPeopleBtn.addEventListener('click', requestPeopleList);
 const socket = io();
 
 socket.on('connect', () => {
-    // what i will be pushing to my server in my users object
+    // what i will be pushing to the server in the users object
     const userInfo = {
         username: currentUserName,
         socket: socket.io.engine.id
     };
     // this emits the event with the user info in order for me to keep track of which user has which socket
-    socket.emit('connectMeetPeople', userInfo);
+    socket.emit('connectToChat', userInfo);
+});
+
+socket.on('stateChange', () => {
+    // we need to wait for this so that we know the promises are finished.
+    requestPeopleList();
 });
 
 socket.on('activeConversations', unreads => {
     const currentChat = document.getElementById('current');
-    // whenever the user connectMeetPeople event is emitted, it returns the activeConversations event with the unread messages
+    // whenever the user connectToChat event is emitted, it returns the activeConversations event with the unread messages
     populateActiveConversations(unreads);
     unreads.forEach(unreadUser => {
         let activeElement = checkIfActiveConversationBlockExists(unreadUser);
         // if there is an existing activeElement
         // AND there is either no currentChat OR there is a currentChat, BUT the textContent is NOT equal to the currently iterated value
-        console.log(activeElement && (!currentChat || (currentChat && currentChat.textContent !== unreadUser)));
         if(activeElement && (!currentChat || (currentChat && currentChat.textContent !== unreadUser))) {
             console.log('ran');
             // compare the active-conversation divs on the screen with the unreadUser we get from our backend and apply the "new" class accordingly.
-            activeElement.setAttribute('class','new active-conversation')
+            activeElement.setAttribute('class','new active-conversation');
+            audio.play();
         };
     });
 });
@@ -103,7 +110,8 @@ function generatePersonCard(person) {
         createElementAndText('li', person.username),
         createElementAndText('li', person.age || 'Unset'),
         createElementAndText('li', person.gender || 'Unset'),
-        createElementAndText('li', person.location || 'Unset')
+        createElementAndText('li', person.location || 'Unset'),
+        createElementAndText('li', person.isOnline ? 'Online' : 'Offline')
     ];
 
     // append multiple children at once
@@ -162,8 +170,15 @@ function removeCurrentFromAll() {
 function personEvent(e) {
     const targetChildren = e.currentTarget.children;
     const info = targetChildren[0].children;
-    const selectedUser = info[0].textContent;
-    const activeElement = checkIfActiveConversationBlockExists(selectedUser);
+    const userObj = {
+        username: info[0].textContent,
+        age: info[1].textContent,
+        gender: info[2].textContent,
+        location: info[3].textContent,
+        about: targetChildren[1].textContent
+    };
+
+    const activeElement = checkIfActiveConversationBlockExists(userObj.username);
 
     if(activeElement) {
         // if this conversation is in our active, we want to show that the user has already seen it by removing the "new" class.
@@ -174,10 +189,39 @@ function personEvent(e) {
     removeCurrentFromAll();
 
     // create a block in the UI with the "current" id
-    createActiveConversationBlock(selectedUser, true);
+    createActiveConversationBlock(userObj.username, true);
 
     // generate message history
-    requestMessageHistory(selectedUser);
+    requestMessageHistory(userObj.username);
+
+    createUserProfile(userObj);
+};
+
+function createUserProfile(userObj) {
+    const selectedProfile = document.getElementById('selected-profile');
+    selectedProfile.innerHTML='';
+    let ulLeft = document.createElement('ul');
+    const aboutPara = createElementAndText('p', userObj.about);
+    const friendBtn = createElementAndText('button', 'Add friend');
+
+    let ulLeftContent = [
+        createElementAndText('li', userObj.username),    
+        createElementAndText('li', userObj.age),    
+        createElementAndText('li', userObj.gender),    
+        createElementAndText('li', userObj.location)    
+    ];
+
+    let docFragLeft = createDocumentFragment(ulLeftContent);
+    ulLeft.appendChild(docFragLeft);
+
+    let selectedContent = [
+        ulLeft,
+        friendBtn,
+        aboutPara
+    ];
+
+    let selectedDocFrag = createDocumentFragment(selectedContent);
+    selectedProfile.appendChild(selectedDocFrag);
 };
 
 
@@ -334,5 +378,4 @@ function scrollToBottom(elem) {
 };
 
 addFormEvent();
-requestPeopleList();
 setFormState();

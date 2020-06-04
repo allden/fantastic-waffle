@@ -6,22 +6,28 @@ const userController = require('./controllers/userController');
 module.exports = (io) => {
     let users = [];
     io.on('connection', socket => {
-        socket.on('disconnect', () => {
-            console.log('disconnected');
-            let filtered = users.filter(user => user.socket !== socket.id);
-            users = [...filtered];
+        socket.on('disconnect', async () => {
+            const disconnectedUser = users.filter(user => user.socket === socket.id)[0];
+            
+            // disconnect the user and pull them from the array
+            let stateChange = await userController.changeState(disconnectedUser.username, false)
+            .then(() => {
+                let filtered = users.filter(user => user.username !== disconnectedUser.username);
+                users = [...filtered];
+                console.log(users);
+                io.emit('stateChange');
+            });
         });
         
         let room = '';
         // what happens on join event, the socket is joined to the room
         socket.on('join', async roomTitle => {
-            // todo maybe send a message to the users stating that someone has joined
-            // todo send an array with all messages for that specific room
             room = roomTitle;
             socket.join(room);
 
             let roomMessages = await publInstController.returnMessages(room)
             .then(msgList => {
+                // emits an object with the history for the current group
                 socket.emit('history', msgList);
             })
             .catch(err => errHandling(err));
@@ -43,12 +49,16 @@ module.exports = (io) => {
         });
 
         // meet people handlers
-        socket.on('connectMeetPeople', async userInfo => {
+        socket.on('connectToChat', async userInfo => {
             users.push(userInfo);
-
-            // this needs to be here so that we can get the username easily
-            const unreadMessages = await privInstController.getAllUnreadConversations(userInfo.username).then(unreads => {
-                socket.emit('activeConversations', unreads);
+            console.log(users);
+            // this needs to be in this specific event so that we can get the username easily from userInfo
+            const unreadMessages = await privInstController.getAllUnreadConversations(userInfo.username).then(async unreads => {
+                const stateChange = await userController.changeState(userInfo.username, true)
+                .then(() => {
+                    socket.emit('activeConversations', unreads);
+                    io.emit('stateChange');
+                });
             });
         });
 
@@ -57,7 +67,7 @@ module.exports = (io) => {
             const recipient = users.filter(user => user.username === messageInfo.to)[0];
             const recipientSocket = recipient ? recipient.socket : '';
 
-            // the data also contains the room because i need it in order to make a room
+            // fetch the room data and then make a room with socket.io
             const data = await privInstController.createPrivateInstance(messageInfo).then(async data => {
                 const room = data.room;
                 const msg = data.msg;
@@ -68,6 +78,7 @@ module.exports = (io) => {
 
                     // return all active conversations when a private message is sent to the logged in user
                     const unreadMessages = await privInstController.getAllUnreadConversations(recipient.username);
+
                     // whenever a private message is sent, we want to emit the user's current active conversations and also the message itself
                     io.to(recipientSocket).emit('activeConversations', unreadMessages);
                 };

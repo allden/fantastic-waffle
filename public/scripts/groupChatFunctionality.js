@@ -13,6 +13,16 @@ const messages = document.getElementById('messages');
 // join the user to the specific room
 socket.emit('join', roomId);
 
+socket.on('connect', () => {
+    // what i will be pushing to the server in the users object
+    const userInfo = {
+        username: currentUserName,
+        socket: socket.io.engine.id
+    };
+    // this emits the event with the user info in order for me to keep track of which user has which socket
+    socket.emit('connectToChat', userInfo);
+});
+
 // this is sent as a response to the user joining
 socket.on('history', msgList => {
     populateHistory(msgList);
