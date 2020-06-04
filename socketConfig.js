@@ -108,9 +108,26 @@ module.exports = (io) => {
             const peopleList = await userController.getUsersAsync();
             socket.emit('requestPeopleList', peopleList);
         });
+
+        socket.on('toggleFriend', async requestObj => {
+            const appendFriend = await userController.toggle(requestObj)
+            .then(result => {
+                return socket.emit('toggleFriend', result);
+            })
+            .catch(err => errHandling(err));
+        });
+
+        socket.on('requestUserProfileData', async requestObj => {
+            const userResponse = await userController.findSpecificUser(requestObj.requester, requestObj.target)
+            .then(userData => {
+                console.log(userData);
+                socket.emit('requestUserProfileData', userData);
+            })
+            .catch(err => errHandling(err));
+        });
     });
 };
 
 function errHandling(err) {
-    console.error(err);
+    return console.error(err);
 };

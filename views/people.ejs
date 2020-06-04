@@ -70,7 +70,7 @@
                     </form>
                 </div>
                 <div id="selected-profile">
-                    
+
                 </div>
             </div>
             <div id="right">
@@ -88,6 +88,7 @@
                 // this is here because we need the ejs user local variable for our script
                 const currentUserName = "<%=user.username%>";
                 const currentUserId = "<%=user._id%>";
+                const friendsList = "<%=user.friendsList%>".split(',');
             </script>
             <script src="/scripts/privateChatFunctionality.js"></script>
         <% }; %>

@@ -10,6 +10,8 @@ const friendsBtn = document.getElementById('friends-btn');
 const meetPeopleBtn = document.getElementById('meet-btn');
 // audio element
 const audio = document.querySelector('audio');
+// this is to determine if the user is on the friends tab or the meet people tab, it will change to 'friends' or 'people' respectively
+let currentlyViewing = '';
 
 // get friendsList based on username whenever you click on the "friends-btn" button
 friendsBtn.addEventListener('click', () => requestFriendsList(currentUserName));
@@ -84,6 +86,7 @@ socket.on('privateMessageHistory', msgArr => {
 });
 
 socket.on('requestFriends', friends => {
+    currentlyViewing = 'friends';
     peopleList.innerHTML='';
     // for every person in the friends array, we create a card for them and then append it to our people list container
     friends.forEach(friend => {
@@ -93,11 +96,25 @@ socket.on('requestFriends', friends => {
 });
 
 socket.on('requestPeopleList', people => {
+    currentlyViewing = 'people';
     peopleList.innerHTML='';
     people.forEach(person => {
         const card = generatePersonCard(person);
         peopleList.appendChild(card);
     });
+});
+
+socket.on('toggleFriend', (result) => {
+    if(currentlyViewing === 'friends') {
+        requestFriendsList(currentUserName);
+    };
+
+    let friendToggler = document.getElementById('friend-toggler');
+    friendToggler.textContent = result;
+});
+
+socket.on('requestUserProfileData', userData => {
+    createUserProfile(userData);
 });
 
 function generatePersonCard(person) {
@@ -194,15 +211,30 @@ function personEvent(e) {
     // generate message history
     requestMessageHistory(userObj.username);
 
-    createUserProfile(userObj);
+    requestUserProfileData(currentUserName, userObj.username);
+};
+
+function requestUserProfileData(requester, target) {
+    let requestObj = {
+        requester,
+        target
+    };
+
+    socket.emit('requestUserProfileData', requestObj);
 };
 
 function createUserProfile(userObj) {
+    // this is what appears below the message window
+    // the purpose of this is to know who we are chatting with and also to give us the option to add them as a friend
     const selectedProfile = document.getElementById('selected-profile');
     selectedProfile.innerHTML='';
     let ulLeft = document.createElement('ul');
     const aboutPara = createElementAndText('p', userObj.about);
-    const friendBtn = createElementAndText('button', 'Add friend');
+    const friendBtn = createElementAndText('button', userObj.isFriend ? 'Remove friend' : 'Add friend');
+    friendBtn.setAttribute('id', 'friend-toggler');
+
+    // give the friendBtn its functionality, which is to add a friend to the user's DB object
+    friendBtn.addEventListener('click', () => toggleFriend(currentUserName, userObj.username));
 
     let ulLeftContent = [
         createElementAndText('li', userObj.username),    
@@ -224,6 +256,14 @@ function createUserProfile(userObj) {
     selectedProfile.appendChild(selectedDocFrag);
 };
 
+function toggleFriend(requester, friend) {
+    let requestObj = {
+        requester,
+        friend
+    };
+
+    socket.emit('toggleFriend', requestObj);
+};
 
 // the event responsible for requesting the messaging history for the selected user
 function requestMessageHistory(to) {
@@ -261,7 +301,7 @@ function formSubmitEvent(e) {
         socket.emit('privateMessage', messageInfo);
     };
 
-    // messageInput.value = '';
+    messageInput.value = '';
 };
 
 function setFormState() {
@@ -365,6 +405,7 @@ function activeConversationEvent(e) {
     // reset the form state so it is now active, and then request the message history
     setFormState();
     requestMessageHistory(selectedUser);
+    requestUserProfileData(currentUserName, selectedUser);
 };
 
 // what happens on receiving and sending a message

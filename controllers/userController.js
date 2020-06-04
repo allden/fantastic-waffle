@@ -148,6 +148,47 @@ module.exports.changeState = (username, state=false) => {
     .catch(err => errHandling(err));
 };
 
+module.exports.toggle = (requestObj) => {
+    // first we need to get the friend's ID so we can append it to the user object
+    console.log('ran');
+    return User.findOne({username: requestObj.friend})
+    .then(foundFriend => {
+        return User.findOne({username: requestObj.requester})
+        .then(foundRequester => {
+            // if user is already in friendsList, remove them, if not, add them.
+            if(foundRequester.friendsList.includes(foundFriend._id)) {
+                return User.findOneAndUpdate({username: requestObj.requester}, {$pull: {friendsList: foundFriend._id}})
+                .then(() => 'Add friend')
+                .catch(err => errHandling(err));
+            } else {
+                return User.findOneAndUpdate({username: requestObj.requester}, {$push: {friendsList: foundFriend._id}})
+                .then(() => 'Remove friend')
+                .catch(err => errHandling(err));
+            };
+        })
+        .catch(err => errHandling(err));
+    })
+    .catch(err => errHandling(err));
+};
+
+module.exports.findSpecificUser = (requester, target) => {
+    return User.findOne({username: target})
+    .then(foundTarget => {
+        return User.findOne({username: requester})
+        .then(foundRequester => {
+            // i honestly could not think of a better way to change the button state between "add friend" and "remove friend",
+            // you may have noticed this already, but this app is made with duct tape and determination
+            let isFriend = foundRequester.friendsList.includes(foundTarget._id);
+            return {
+                isFriend,
+                ...foundTarget.toObject()
+            }
+        })
+        .catch(err => errHandling(err));
+    })
+    .catch(err => errHandling(err));
+};
+
 function errHandling(err) {
     return console.error(err);
 };
