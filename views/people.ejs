@@ -90,7 +90,10 @@
                 const currentUserId = "<%=user._id%>";
                 const friendsList = "<%=user.friendsList%>".split(',');
             </script>
-            <script src="/scripts/privateChatFunctionality.js"></script>
+            <script src="/scripts/privateChatFunctionality/main.js"></script>
+            <script src="/scripts/privateChatFunctionality/socketEventRequests.js"></script>
+            <script src="/scripts/privateChatFunctionality/socketEventHandlers.js"></script>
+            <script src="/scripts/privateChatFunctionality/DOMManipulation.js"></script>
         <% }; %>
     </body>
 </html>
