@@ -12,7 +12,7 @@ function formSubmitEvent(e) {
     const messageInput = document.getElementById('message-input');
     const message = messageInput.value;
 
-    if(selectedUser !== '' && message !== '') {
+    if(selectedUser !== '' && message.trim() !== '') {
         const messageInfo = {
             from: currentUserId,
             to: selectedUser,
@@ -38,16 +38,28 @@ function setFormState() {
 
 function formatMessage(msg) {
     const sender = msg.sender.username;
-    const date = msg.date;
+    const date = new Date(msg.date).toLocaleString();
     const content = msg.content;
 
     // this is what will represent the message in the UI
     const messageDiv = document.createElement('div');
+    const infoDiv = document.createElement('div');
+    infoDiv.setAttribute('class', 'd-flex align-items-center justify-content-between');
     const userHeader = createElementAndText('h3', sender);
-    const datePara = createElementAndText('p', date);
+    const datePara = document.createElement('p');
+    const fineDatePrint = createElementAndText('small', date);
+    datePara.appendChild(fineDatePrint);
     const contentPara = createElementAndText('p', content);
 
-    const elemList = [userHeader, datePara, contentPara];
+    const infoElemList = [
+        userHeader,
+        datePara
+    ];
+
+    const infoFragment = createDocumentFragment(infoElemList);
+    infoDiv.appendChild(infoFragment);
+
+    const elemList = [infoDiv, contentPara];
     const docFrag = createDocumentFragment(elemList);
 
     // add the entirety of docFrag instead of appending one by one
@@ -68,7 +80,7 @@ function createActiveConversationBlock(user, currentToggle=false) {
     // we have an array with every user that we currently hold an active conversation with
     if(activeConversationBlock === false) {
         const listElem = document.createElement('li');
-        listElem.setAttribute('class', 'active-conversation');
+        listElem.setAttribute('class', 'active-conversation rounded-0 btn-darker btn');
 
         // if current parameter is true, then we want this to be the selected conversation. this will be used for the person card on-click event.
         if(currentToggle) {
@@ -110,7 +122,7 @@ function checkIfActiveConversationBlockExists(user) {
         };
     };
 
-    // we will then use this boolean to decide if this user will be appended to the #active-conversations div.
+    // we will then use this boolean to decide if this user will be appended to the #active-conversation rounded-0 btn-darker btns div.
     return false
 };
 
@@ -122,7 +134,7 @@ function activeConversationEvent(e) {
     removeCurrentFromAll();
     currentElement.setAttribute('id', 'current');
     // remove the 'new' class, so the user knows that they've already seen this.
-    currentElement.setAttribute('class', 'active-conversation');
+    currentElement.setAttribute('class', 'active-conversation rounded-0 btn-darker btn');
     // reset the form state so it is now active, and then request the message history
     setFormState();
     requestMessageHistory(selectedUser);
@@ -136,6 +148,7 @@ function appendMessage(msg) {
 
 // this is here so that the chat will be scrolled to the bottom on every message so the user doesn't have to scroll manually
 function scrollToBottom(elem) {
+    elem.scrollTop = 0;
     elem.scrollTop = elem.scrollHeight;
 };
 
@@ -143,11 +156,15 @@ function createUserProfile(userObj) {
     // this is what appears below the message window
     // the purpose of this is to know who we are chatting with and also to give us the option to add them as a friend
     const selectedProfile = document.getElementById('selected-profile');
+    const userActionsDiv = document.createElement('div');
+    userActionsDiv.setAttribute('class', 'd-flex justify-content-between mb-3 align-items-center');
     selectedProfile.innerHTML='';
     let ulLeft = document.createElement('ul');
+    ulLeft.setAttribute('class', 'list-unstyled d-flex p-0 m-0')
     const aboutPara = createElementAndText('p', userObj.about);
-    const friendBtn = createElementAndText('button', userObj.isFriend ? 'Remove friend' : 'Add friend');
+    const friendBtn = createElementAndText('button', userObj.isFriend ? 'Unfriend' : 'Friend');
     friendBtn.setAttribute('id', 'friend-toggler');
+    friendBtn.setAttribute('class', 'btn btn-complement');
 
     // give the friendBtn its functionality, which is to add a friend to the user's DB object
     friendBtn.addEventListener('click', () => toggleFriend(currentUserName, userObj.username));
@@ -159,12 +176,23 @@ function createUserProfile(userObj) {
         createElementAndText('li', userObj.location)    
     ];
 
+    ulLeftContent.forEach(item => {
+        item.setAttribute('class', 'mr-3');
+    });
+
     let docFragLeft = createDocumentFragment(ulLeftContent);
     ulLeft.appendChild(docFragLeft);
 
-    let selectedContent = [
+    let userActionsContent = [
         ulLeft,
-        friendBtn,
+        friendBtn
+    ];
+
+    const userActionsDocFrag = createDocumentFragment(userActionsContent);
+    userActionsDiv.appendChild(userActionsDocFrag);
+
+    let selectedContent = [
+        userActionsDiv,
         aboutPara
     ];
 
@@ -196,7 +224,7 @@ function personEvent(e) {
 
     if(activeElement) {
         // if this conversation is in our active, we want to show that the user has already seen it by removing the "new" class.
-        activeElement.setAttribute('class', 'active-conversation');
+        activeElement.setAttribute('class', 'active-conversation rounded-0 btn-darker btn');
     };
 
     // remove the "current" id from the holder element
@@ -214,9 +242,10 @@ function personEvent(e) {
 function generatePersonCard(person) {
     // what will appear for each user
     const container = document.createElement('div');
-    container.setAttribute('class', 'person');
+    container.setAttribute('class', 'person p-3 btn btn-primary w-100 mb-3 text-light text-left');
     const about = createElementAndText('p', person.about || 'Unset');
     const unorderedList = document.createElement('ul');
+    unorderedList.setAttribute('class', 'list-unstyled d-flex');
     const listItems = [
         createElementAndText('li', person.username),
         createElementAndText('li', person.age || 'Unset'),
@@ -224,6 +253,10 @@ function generatePersonCard(person) {
         createElementAndText('li', person.location || 'Unset'),
         createElementAndText('li', person.isOnline ? 'Online' : 'Offline')
     ];
+
+    listItems.forEach(item => {
+        item.setAttribute('class', 'pr-4');
+    });
 
     // append multiple children at once
     const docFrag = createDocumentFragment(listItems);

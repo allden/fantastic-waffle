@@ -27,7 +27,7 @@ socket.on('privateMessage', msg => {
     // the message.
     if(currentChat && sender === currentChat.textContent || sender === currentUserName) {
         appendMessage(msg);
-        scrollToBottom(messages);
+        scrollToBottom(chat);
     };
 
     /* 
@@ -51,7 +51,7 @@ socket.on('privateMessageHistory', msgArr => {
             appendMessage(msg);
         });
     };
-    scrollToBottom(messages);
+    scrollToBottom(chat);
 });
 
 socket.on('requestFriends', friends => {

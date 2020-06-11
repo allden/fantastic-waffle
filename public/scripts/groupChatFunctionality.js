@@ -67,7 +67,7 @@ function msgElement(msgObj) {
     return `
         <div>
             <p>${!msgObj.sender ? 'deleted' : msgObj.sender.username}</p>
-            <p>${msgObj.date}</p>
+            <p>${new Date(msgObj.date).toLocaleString()}</p>
             <p>${msgObj.content}</p>
         </div>
     `;

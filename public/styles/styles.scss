@@ -1,0 +1,73 @@
+$theme-colors: (
+    "primary": #9e7f73,
+    "complement": #ff6c3f,
+    "secondary": #61514b,
+    "darker": #4a3a34
+);
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@import "../../node_modules/bootstrap/scss/bootstrap.scss";
+
+
+body {
+    background: map-get($theme-colors, darker);
+    color: white;
+    font-family: 'Roboto', sans-serif;
+}
+
+.bg-complement {
+    background: map-get($theme-colors, complement);
+}
+
+.bg-darker {
+    background: map-get($theme-colors, darker);
+}
+
+.btn-complement {
+    background: map-get($theme-colors, complement);
+}
+
+.btn-complement:hover {
+    background: darken(map-get($theme-colors, complement), 8%) !important;
+}
+
+.btn-darker {
+    background: map-get($theme-colors, darker);
+}
+
+.btn-darker:hover {
+    background: darken(map-get($theme-colors, darker), 8%) !important;
+}
+
+.new {
+    background: lighten(map-get($theme-colors, complement), 10%) !important;
+}
+
+#current {
+    background: map-get($theme-colors, complement) !important;
+}
+
+#active-conversations {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+}
+
+.viewport-fit {
+    height: calc(100vh - 56px);   
+}
+
+#message-form {
+    top: 75%;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#message-input {
+    flex-grow: 1;
+}

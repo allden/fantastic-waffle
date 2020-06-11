@@ -158,11 +158,11 @@ module.exports.toggle = (requestObj) => {
             // if user is already in friendsList, remove them, if not, add them.
             if(foundRequester.friendsList.includes(foundFriend._id)) {
                 return User.findOneAndUpdate({username: requestObj.requester}, {$pull: {friendsList: foundFriend._id}})
-                .then(() => 'Add friend')
+                .then(() => 'Friend')
                 .catch(err => errHandling(err));
             } else {
                 return User.findOneAndUpdate({username: requestObj.requester}, {$push: {friendsList: foundFriend._id}})
-                .then(() => 'Remove friend')
+                .then(() => 'Unfriend')
                 .catch(err => errHandling(err));
             };
         })

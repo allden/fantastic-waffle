@@ -1,5 +1,7 @@
 // message window
 const messages = document.getElementById('messages');
+// the element responsible for scrolling
+const chat = document.getElementById('chat');
 // list of currently active conversations
 const activeConversations = document.getElementById('active-conversations');
 // list of people container

@@ -3,81 +3,45 @@
     <head>
         <%- include('partials/head'); %>
         <title>Meet People</title>
-        <style>
-            #container {
-                display: flex;
-                flex-direction: row;
-            }
-
-            /* will be split later with bootstrap grid system */
-            #left, #right {
-                width: 100%;
-            }
-
-            /* will also be handled with bootstrap */
-            #active-conversations {
-                display: flex;
-                list-style: none;
-            }
-
-            #active-conversations li {
-                padding: 1rem;
-            }
-
-
-            /* bootstrap btns */
-            .active-conversation, .person {
-                background: #ddd;
-            }
-
-            .active-conversation:hover, .person:hover {
-                background: #aaa;
-                cursor: pointer;
-            }
-
-            /* current might need a unique class to make it apparent */
-            #current {
-                background: #333;
-                color: white;
-            }
-
-            /* this as well */
-            .new {
-                background: coral;
-            }
-        </style>
     </head>
     <body>
-        <%- include('partials/nav'); %>
-        <h1>Meet People</h1>
-        <div id="container">
+        <div id="container" class="container-fluid text-white p-0 viewport-fit d-flex flex-column align-items-stretch">
+            <%- include('partials/nav'); %>
             <audio>
                 <source src="/sfx/ding.wav" type="audio/wav">
                 Your browser does not support the audio file.
             </audio>
-            <div id="left">
-                <div id="chat">
-                    <div id="chat-list">
-                        <ul id="active-conversations">
-                        </ul>
+            <div class="container-fluid viewport-fit">
+                <div class="row h-100">
+                    <div id="left" class="col-xs-12 col-lg-8 p-0 h-100">
+                        <div id="chat" class="overflow-auto h-75 position-relative bg-secondary">
+                            <div id="chat-list" class="sticky-top">
+                                <ul id="active-conversations" class="list-unstyled">
+                                    <!-- All Active Conversations Go Here -->
+                                </ul>
+                            </div>
+                            <div id="messages" class="px-3">
+                                <!-- All Messages Go Here -->
+                            </div>
+                            <form id="message-form" class="bg-primary w-100 position-sticky h-25">
+                                <textarea id="message-input" placeholder="type in your message" class="w-100 p-3"></textarea>
+                                <button class="btn btn-complement w-100">Send</button>
+                            </form>
+                        </div>
+                        <div id="selected-profile" class="h-25 p-3 bg-darker">
+                            <!-- Profile Info Goes Here -->
+                        </div>
                     </div>
-                    <div id="messages">
-        
-                    </div>
-                    <form id="message-form">
-                        <textarea id="message-input" placeholder="type in your message" required></textarea>
-                        <button>Send</button>
-                    </form>
-                </div>
-                <div id="selected-profile">
-
-                </div>
-            </div>
-            <div id="right">
-                <div id="people-navigation">
-                    <button id="friends-btn">Friends</button>
-                    <button id="meet-btn">Meet People</button>
-                    <div id="people-list">
+                    <div id="right" class="col-xs-12 col-lg-4 bg-darker h-100 overflow-auto">
+                        <div id="people-navigation">
+                            <div id="people-nav-controls" class="bg-darker py-3 sticky-top">
+                                <button id="friends-btn" class="btn btn-complement text-light mr-2">Friends</button>
+                                <button id="meet-btn" class="btn btn-complement text-light">Meet People</button>
+                            </div>
+                            <div id="people-list">
+                                <!-- List of People Goes Here -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -95,5 +59,6 @@
             <script src="/scripts/privateChatFunctionality/socketEventHandlers.js"></script>
             <script src="/scripts/privateChatFunctionality/DOMManipulation.js"></script>
         <% }; %>
+        <%- include('partials/scripts'); %>
     </body>
 </html>

@@ -16,9 +16,12 @@
         </div>
         <script src="/socket.io/socket.io.js"></script>
         <script>
-            // again needed because we reference the user local
-            const currentUserId = "<%= user._id %>";
+            // this is here because we need the ejs user local variable for our script
+            const currentUserName = "<%=user.username%>";
+            const currentUserId = "<%=user._id%>";
+            const friendsList = "<%=user.friendsList%>".split(',');
         </script>
         <script src="/scripts/groupChatFunctionality.js"></script>
+        <%- include('partials/scripts'); %>
     </body>
 </html>
