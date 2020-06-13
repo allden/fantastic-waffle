@@ -5,10 +5,8 @@ $theme-colors: (
     "darker": #4a3a34
 );
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+a {
+    color: blue !important;
 }
 
 @import "../../node_modules/bootstrap/scss/bootstrap.scss";
@@ -20,12 +18,16 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
+.text-darker {
+    color: map-get($theme-colors, darker);
+}
+
 .bg-complement {
-    background: map-get($theme-colors, complement);
+    background: map-get($theme-colors, complement) !important;
 }
 
 .bg-darker {
-    background: map-get($theme-colors, darker);
+    background: map-get($theme-colors, darker) !important;
 }
 
 .btn-complement {

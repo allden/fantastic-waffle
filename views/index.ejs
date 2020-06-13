@@ -7,8 +7,12 @@
     <body>
         <%- include('partials/nav'); %>
         <%- include('partials/messages'); %>
-        <h1><%= user ? `Welcome, ${user.username}` : 'Welcome!'%></h1>
-        <p>This website is for websocket testing purposes.</p>
+        <div class="container-fluid d-flex flex-row align-items-center justify-content-center viewport-fit">
+            <div class="jumbotron bg-complement text-center">
+                <h1><%= user ? `Welcome, ${user.username}` : 'Welcome!'%></h1>
+                <p>This website is for websocket testing purposes.</p>
+            </div>
+        </div>
         <%- include('partials/scripts'); %>
     </body>
 </html>

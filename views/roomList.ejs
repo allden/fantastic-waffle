@@ -6,13 +6,17 @@
     </head>
     <body>
         <%- include('partials/nav'); %>
-        <h1>List of Rooms</h1>
-        <ul>
-            <% rooms.forEach(room => { %>
-                <li><a href="/room/<%=room.title%>"><%=room.title%></a></li>
-            <% }); %>
-        </ul>
-        <p>Don't like any of these? <a href="/room">Create your own.</a></p>
+        <div class="container-fluid viewport-fit d-flex align-items-center justify-content-center">
+            <div class="jumbotron-fluid bg-complement text-white p-4">
+                <h1>List of Rooms</h1>
+                <ul class="list-unstyled">
+                    <% rooms.forEach(room => { %>
+                        <li><a class="text-darker" href="/room/<%=room.title%>"><%=room.title%></a></li>
+                    <% }); %>
+                </ul>
+                <p>Don't like any of these? <a class="text-darker" href="/room">Create your own.</a></p>
+            </div>
+        </div>
         <%- include('partials/scripts'); %>
     </body>
 </html>
