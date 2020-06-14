@@ -6,10 +6,11 @@
     </head>
     <body>
         <%- include('partials/nav'); %>
-        <%- include('partials/messages'); %>
         <div class="container-fluid d-flex align-items-center justify-content-center viewport-fit">
-            <div class="jumbotron-fluid bg-complement">
-                <form method="POST" action="/user/<%=user.username%>/settings" class="d-flex flex-column p-4">
+            <div class="jumbotron-fluid bg-complement w-75 p-4">
+                <h1 class="text-center">User Settings</h1>
+                <%- include('partials/messages'); %>
+                <form method="POST" action="/settings" class="d-flex flex-column">
                     <div class="form-group d-flex flex-column">
                         <label for="about">About:</label>
                         <textarea class="form-control" id="about" name="about" placeholder="Tell us something about yourself."><%=typeof formData !== 'undefined' ? formData.about : user.about%></textarea>
@@ -279,6 +280,12 @@
                 </form>
             </div>
         </div>
+        <% const currentCountry = typeof formData !== 'undefined' ? formData.country : user.location %>;
+        <% const currentGender = typeof formData !== 'undefined' ? formData.gender : user.gender %>;
+        <script>
+            const currentCountry = "<%=currentCountry%>";
+            const currentGender = "<%=currentGender%>";
+        </script>
         <script src="/scripts/populateForm.js"></script>
         <%- include('partials/scripts'); %>
     </body>

@@ -14,7 +14,7 @@ socket.on('activeConversations', unreads => {
         if(activeElement && (!currentChat || (currentChat && currentChat.textContent !== unreadUser))) {
             console.log('ran');
             // compare the active-conversation divs on the screen with the unreadUser we get from our backend and apply the "new" class accordingly.
-            activeElement.setAttribute('class','new active-conversation');
+            activeElement.setAttribute('class','new active-conversation rounded-0 btn-darker btn');
             audio.play();
         };
     });

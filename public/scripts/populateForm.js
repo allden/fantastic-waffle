@@ -3,11 +3,11 @@ const genderSel = document.getElementById('gender');
 
 function selectSpecific(elem, value) {
     for(let i = 0; i < elem.options.length; i++) {
-        if(elem.options[i].value === value) {
+        if(elem.options[i].value.toString().trim() === value.toString().trim()) {
             elem.selectedIndex = i;
         };
     };
 };
 
-selectSpecific(countrySel, "<%=typeof formData !== 'undefined' ? formData.country : user.location%>");
-selectSpecific(genderSel, "<%=typeof formData !== 'undefined' ? formData.gender : user.gender%>");
+selectSpecific(countrySel, currentCountry);
+selectSpecific(genderSel, currentGender);

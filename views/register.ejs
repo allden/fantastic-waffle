@@ -6,17 +6,27 @@
     </head>
     <body>
         <%- include('partials/nav'); %>
-        <h1>Sign Up</h1>
-        <%- include('partials/messages'); %>
-        <form method="POST" action="/register">
-            <label for="username">Username:</label>
-            <input type="text" name="username" id="username">
-            <label for="password">Password:</label>
-            <input type="password" name="password" id="password">
-            <label for="password2">Confirm password:</label>
-            <input type="password" name="password2" id="password2">
-            <button class="btn">Submit</button>
-        </form>
+        <div class="container-fluid d-flex align-items-center justify-content-center viewport-fit">
+            <div class="jumbotron-fluid bg-complement p-4 w-75">
+                <h1 class="text-center">Sign Up</h1>
+                <%- include('partials/messages'); %>
+                <form method="POST" action="/register">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input class="form-control" type="text" name="username" placeholder="Ex. billybob20" id="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input class="form-control" type="password" name="password" placeholder="Ex. $trongP4ssw0rd!" id="password">
+                    </div>
+                    <div class="form-group">
+                        <label for="password2">Confirm password:</label>
+                        <input class="form-control" type="password" name="password2" placeholder="Please repeat the password you previously entered." id="password2">
+                    </div>
+                    <button class="btn btn-darker w-100">Submit</button>
+                </form>
+            </div>
+        </div>
         <%- include('partials/scripts'); %>
     </body>
 </html>

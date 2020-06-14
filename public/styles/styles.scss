@@ -1,13 +1,9 @@
 $theme-colors: (
-    "primary": #9e7f73,
-    "complement": #ff6c3f,
-    "secondary": #61514b,
-    "darker": #4a3a34
+    "primary": #b56181,
+    "complement": #85a34e,
+    "secondary": #664757,
+    "darker": #453942,
 );
-
-a {
-    color: blue !important;
-}
 
 @import "../../node_modules/bootstrap/scss/bootstrap.scss";
 
@@ -18,8 +14,18 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
+body, html {
+    overflow: hidden !important;
+}
+
 .text-darker {
     color: map-get($theme-colors, darker);
+}
+
+.alert-complement {
+    background: darken(map-get($theme-colors, complement), 13%) !important;
+    border: 0 !important;
+    color: white !important;
 }
 
 .bg-complement {
@@ -72,4 +78,8 @@ body {
 
 #message-input {
     flex-grow: 1;
+}
+
+#right, #left {
+    transition: transform .5s;
 }

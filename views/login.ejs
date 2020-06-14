@@ -6,21 +6,29 @@
     </head>
     <body>
         <%- include('partials/nav'); %>
-        <% if(errors.length > 0) { %>
-            <ul>
-                <% errors.forEach(error => { %>
-                    <li><%=error%></li>
-                <% }); %>
-            </ul>
-        <% }; %>
-        <h1>Login</h1>
-        <form action="/login" method="POST">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password">
-            <button class="btn">Login</button>
-        </form>
+        <div class="container-fluid d-flex align-items-center justify-content-center viewport-fit">
+            <div class="jumbotron-fluid bg-complement p-4 w-75">
+                <h1 class="text-center">Login</h1>
+                <% if(errors.length > 0) { %>
+                    <ul class="list-unstyled">
+                        <% errors.forEach(error => { %>
+                            <li class="alert alert-complement"><%=error%></li>
+                        <% }); %>
+                    </ul>
+                <% }; %>
+                <form action="/login" method="POST">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input class="form-control" type="text" id="username" name="username" placeholder="Please enter the username you registered with. Ex. Billybob20">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input class="form-control" type="password" id="password" name="password" placeholder="Please enter the password that you entered when registering.">
+                    </div>
+                    <button class="btn btn-darker w-100">Login</button>
+                </form>
+            </div>
+        </div>
         <%- include('partials/scripts'); %>
     </body>
 </html>

@@ -6,14 +6,30 @@
     </head>
     <body>
         <div id="container" class="container-fluid text-white p-0 viewport-fit d-flex flex-column align-items-stretch">
-            <%- include('partials/nav'); %>
+            <!-- NAV -->
+            <nav class="navbar navbar-dark bg-complement">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <button id="people-list-toggler" class="btn btn-complement">Hide People</button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/rooms">Chat Rooms</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/people">Meet People</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/settings">Profile</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                    </ul>
+                </div>
+            </nav>
+            <!-- CONTENT -->
             <audio>
                 <source src="/sfx/ding.wav" type="audio/wav">
                 Your browser does not support the audio file.
             </audio>
             <div class="container-fluid viewport-fit">
                 <div class="row h-100">
-                    <div id="left" class="col-xs-12 col-lg-8 p-0 h-100">
+                    <div id="left" class="col-12 p-0 h-100">
                         <div id="chat" class="overflow-auto h-75 position-relative bg-secondary">
                             <div id="chat-list" class="sticky-top">
                                 <ul id="active-conversations" class="list-unstyled">
@@ -32,7 +48,7 @@
                             <!-- Profile Info Goes Here -->
                         </div>
                     </div>
-                    <div id="right" class="col-xs-12 col-lg-4 bg-darker h-100 overflow-auto">
+                    <div id="right" class="col-12 bg-darker viewport-fit overflow-auto position-absolute">
                         <div id="people-navigation">
                             <div id="people-nav-controls" class="bg-darker py-3 sticky-top">
                                 <button id="friends-btn" class="btn btn-complement text-light mr-2">Friends</button>

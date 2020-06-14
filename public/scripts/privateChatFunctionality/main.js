@@ -1,3 +1,5 @@
+// the profile of the currently selected user
+const selectedProfile = document.getElementById('selected-profile');
 // message window
 const messages = document.getElementById('messages');
 // the element responsible for scrolling
@@ -10,6 +12,11 @@ const peopleList = document.getElementById('people-list');
 const friendsBtn = document.getElementById('friends-btn');
 // meet people btn
 const meetPeopleBtn = document.getElementById('meet-btn');
+// people list toggler
+const peopleListToggler = document.getElementById('people-list-toggler');
+// this will disappear whenever the user presses the peopleListCloseBtn
+const right = document.getElementById('right');
+const left = document.getElementById('left');
 // audio element
 const audio = document.querySelector('audio');
 // this is to determine if the user is on the friends tab or the meet people tab, it will change to 'friends' or 'people' respectively

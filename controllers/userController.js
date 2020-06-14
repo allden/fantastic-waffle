@@ -63,7 +63,7 @@ module.exports.getSettingsForm = (req, res) => {
 };
 
 module.exports.updateSettings = (req, res) => {
-    const {name} = req.params;
+    const {username} = req.user;
     const {about, age, gender, country} = req.body;
     let ageRegex = /^[0-9]+$/;
     let genderRegex = /^[A-Za-z]+$/;
@@ -96,7 +96,7 @@ module.exports.updateSettings = (req, res) => {
         });
     };
 
-    User.findOneAndUpdate({username: name}, 
+    User.findOneAndUpdate({username}, 
     {
         about, 
         age, 

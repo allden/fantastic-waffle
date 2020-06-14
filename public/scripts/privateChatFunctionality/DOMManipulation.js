@@ -1,3 +1,5 @@
+peopleListToggler.addEventListener('click', togglePeopleList);
+
 // adds the event for the message form
 function addFormEvent() {
     const form = document.getElementById('message-form');
@@ -8,7 +10,7 @@ function addFormEvent() {
 // the actual event that will be triggered by the message form, in this case it controls 
 function formSubmitEvent(e) {
     e.preventDefault();
-    const selectedUser = document.getElementById('current').textContent;
+    const selectedUser = document.getElementById('current') ? document.getElementById('current').textContent : '';
     const messageInput = document.getElementById('message-input');
     const message = messageInput.value;
 
@@ -155,19 +157,46 @@ function scrollToBottom(elem) {
 function createUserProfile(userObj) {
     // this is what appears below the message window
     // the purpose of this is to know who we are chatting with and also to give us the option to add them as a friend
-    const selectedProfile = document.getElementById('selected-profile');
     const userActionsDiv = document.createElement('div');
-    userActionsDiv.setAttribute('class', 'd-flex justify-content-between mb-3 align-items-center');
-    selectedProfile.innerHTML='';
+    userActionsDiv.setAttribute('class', 'mb-3 row px-3');
+    clearProfile();
     let ulLeft = document.createElement('ul');
-    ulLeft.setAttribute('class', 'list-unstyled d-flex p-0 m-0')
+    ulLeft.setAttribute('class', 'list-unstyled d-flex p-0 m-0 col-6')
     const aboutPara = createElementAndText('p', userObj.about);
-    const friendBtn = createElementAndText('button', userObj.isFriend ? 'Unfriend' : 'Friend');
+
+    // DROPDOWN START
+    let controlDiv = document.createElement('div');
+    controlDiv.setAttribute('class', 'col-6 d-flex justify-content-end');
+    // dropdown btn
+    const dropdown = createElementAndText('button', 'Options');
+    dropdown.setAttribute('class', 'dropdown-toggle btn btn-complement')
+    dropdown.setAttribute('data-toggle', 'dropdown');
+
+    const dropdownDiv = document.createElement('div');
+    dropdownDiv.setAttribute('class', 'dropdown-menu');
+    const friendBtn = createElementAndText('a', userObj.isFriend ? 'Unfriend' : 'Friend');
+    // the id is used for the event so that it may change the state afterwards
     friendBtn.setAttribute('id', 'friend-toggler');
-    friendBtn.setAttribute('class', 'btn btn-complement');
+    friendBtn.setAttribute('class', 'dropdown-item');
 
     // give the friendBtn its functionality, which is to add a friend to the user's DB object
     friendBtn.addEventListener('click', () => toggleFriend(currentUserName, userObj.username));
+
+    // responsible for closing the chat window
+    const closeBtn = createElementAndText('a', 'Close Chat');
+    closeBtn.setAttribute('class', 'dropdown-item');
+    
+    closeBtn.addEventListener('click', () => {
+        clearAll(userObj.username);
+    });
+
+    const dropdownDivFragment = createDocumentFragment([friendBtn, closeBtn]);
+    dropdownDiv.appendChild(dropdownDivFragment);
+
+    const controlDivFragment = createDocumentFragment([dropdown, dropdownDiv]);
+    controlDiv.appendChild(controlDivFragment);
+
+    // DROPDOWN END
 
     let ulLeftContent = [
         createElementAndText('li', userObj.username),    
@@ -185,7 +214,7 @@ function createUserProfile(userObj) {
 
     let userActionsContent = [
         ulLeft,
-        friendBtn
+        controlDiv
     ];
 
     const userActionsDocFrag = createDocumentFragment(userActionsContent);
@@ -198,6 +227,31 @@ function createUserProfile(userObj) {
 
     let selectedDocFrag = createDocumentFragment(selectedContent);
     selectedProfile.appendChild(selectedDocFrag);
+};
+
+function clearFromActives(username) {
+    const activeConvChildren = activeConversations.children;
+    for(let child of activeConvChildren) {
+        if(child.textContent === username) {
+            child.remove();
+        };
+    };
+
+    setFormState();
+};
+
+function clearMessages() {
+    messages.innerHTML='';
+};
+
+function clearProfile() {
+    selectedProfile.innerHTML='';
+};
+
+function clearAll(user) {
+    clearMessages();
+    clearProfile();
+    clearFromActives(user);
 };
 
 // removes the "current" id if it exists
@@ -219,13 +273,16 @@ function personEvent(e) {
         location: info[3].textContent,
         about: targetChildren[1].textContent
     };
-
+    
     const activeElement = checkIfActiveConversationBlockExists(userObj.username);
-
+    
     if(activeElement) {
         // if this conversation is in our active, we want to show that the user has already seen it by removing the "new" class.
         activeElement.setAttribute('class', 'active-conversation rounded-0 btn-darker btn');
     };
+    
+    // hide the right div and free space for the chat
+    togglePeopleList();
 
     // remove the "current" id from the holder element
     removeCurrentFromAll();
@@ -290,6 +347,18 @@ function createDocumentFragment(elemList) {
     });
 
     return docFrag;
+};
+
+function togglePeopleList() {
+    if(!right.style.transform || right.style.transform === "translateX(0px)") {
+        peopleListToggler.textContent = 'Show People';
+        left.style.transform = "translateX(0px)";
+        right.style.transform = "translateX(100%)";
+    } else {
+        peopleListToggler.textContent = 'Hide People';
+        left.style.transform = "translateX(-100%)";
+        right.style.transform = "translateX(0px)";
+    };
 };
 
 addFormEvent();

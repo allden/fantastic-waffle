@@ -7,8 +7,8 @@ const publicRoomController = require('./controllers/publicInstanceController');
 const userController = require('./controllers/userController');
 
 // user controllers
-router.get('/user/:name/settings', checkAuth, userController.getSettingsForm);
-router.post('/user/:name/settings', checkAuth, userController.updateSettings);
+router.get('/settings', checkAuth, userController.getSettingsForm);
+router.post('/settings', checkAuth, userController.updateSettings);
 
 // room controllers
 router.get('/room/:title', checkAuth, publicRoomController.getSpecificRoom);
