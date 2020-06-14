@@ -86,7 +86,7 @@ module.exports.updateSettings = (req, res) => {
     if(errors.length > 0) {
         req.flash('messages', errors);
         res.locals.messages = req.flash('messages');
-        res.render('settings', {
+        return res.render('settings', {
             formData: {
                 about, 
                 age, 
@@ -94,28 +94,28 @@ module.exports.updateSettings = (req, res) => {
                 country
             }
         });
+    } else {
+        User.findOneAndUpdate({username}, 
+        {
+            about, 
+            age, 
+            gender, 
+            location: country
+        })
+        .then(() => {
+            req.flash('messages', 'Successfully  updated.');
+            res.locals.messages = req.flash('messages');
+            return res.render('settings', {
+                formData: {
+                    about, 
+                    age, 
+                    gender, 
+                    country
+                }
+            });
+        })
+        .catch(err => errHandling(err));
     };
-
-    User.findOneAndUpdate({username}, 
-    {
-        about, 
-        age, 
-        gender, 
-        location: country
-    })
-    .then(() => {
-        req.flash('messages', 'Successfully  updated.');
-        res.locals.messages = req.flash('messages');
-        res.render('settings', {
-            formData: {
-                about, 
-                age, 
-                gender, 
-                country
-            }
-        });
-    })
-    .catch(err => errHandling(err));
 };
 
 module.exports.getUsers = (req, res) => {
@@ -150,7 +150,6 @@ module.exports.changeState = (username, state=false) => {
 
 module.exports.toggle = (requestObj) => {
     // first we need to get the friend's ID so we can append it to the user object
-    console.log('ran');
     return User.findOne({username: requestObj.friend})
     .then(foundFriend => {
         return User.findOne({username: requestObj.requester})

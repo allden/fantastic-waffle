@@ -90,7 +90,6 @@ module.exports.createPublicRoom = (req, res) => {
             })
             .save()
             .then(room => {
-                console.log('Room created successfully', room);
                 req.flash('messages', 'Success!');
                 res.locals.messages = req.flash('messages');
                 return res.render('createRoom');

@@ -80,6 +80,14 @@ body, html {
     flex-grow: 1;
 }
 
+#left {
+    transform: translateX(-100%);
+}
+
+#right {
+    transform: translateX(0px);
+}
+
 #right, #left {
     transition: transform .5s;
 }

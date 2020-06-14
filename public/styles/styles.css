@@ -11227,6 +11227,18 @@ body, html {
           flex-grow: 1;
 }
 
+#left {
+  -webkit-transform: translateX(-100%);
+          transform: translateX(-100%);
+  z-index: 9999;
+}
+
+#right {
+  -webkit-transform: translateX(0px);
+          transform: translateX(0px);
+  z-index: 9999;
+}
+
 #right, #left {
   -webkit-transition: -webkit-transform .5s;
   transition: -webkit-transform .5s;

@@ -10,14 +10,7 @@ const userController = require('./controllers/userController');
 router.get('/settings', checkAuth, userController.getSettingsForm);
 router.post('/settings', checkAuth, userController.updateSettings);
 
-// room controllers
-router.get('/room/:title', checkAuth, publicRoomController.getSpecificRoom);
-
 router.get('/people', checkAuth, userController.getUsers);
-
-router.get('/rooms', checkAuth, publicRoomController.getAllPublicRooms);
-router.get('/room', checkAuth, publicRoomController.getPublicRoomForm);
-router.post('/room', checkAuth, publicRoomController.createPublicRoom);
 
 // register
 router.get('/register', (req, res) => {

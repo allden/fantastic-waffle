@@ -2,7 +2,7 @@
 <html lang="en-US">
     <head>
         <%- include('partials/head'); %>
-        <title>Sanity Check</title>
+        <title>Chat Application</title>
     </head>
     <body>
         <%- include('partials/nav'); %>
@@ -10,7 +10,7 @@
             <div class="jumbotron bg-complement text-center w-75">
                 <%- include('partials/messages'); %>
                 <h1><%= user ? `Welcome, ${user.username}` : 'Welcome!'%></h1>
-                <p>This website is for websocket testing purposes.</p>
+                <p class="lead">This website is for websocket testing purposes.</p>
             </div>
         </div>
         <%- include('partials/scripts'); %>
