@@ -24,6 +24,10 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
+body.keyboard {
+    height: calc(100vh + 500px) !important;
+}
+
 .text-darker {
     color: map-get($theme-colors, darker);
 }
