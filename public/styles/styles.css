@@ -11310,23 +11310,20 @@ a.text-darker:hover, a.text-darker:focus {
   }
 }
 
-html {
-  height: 100vh;
-}
-
 .text-support {
   color: #fc9cb9;
 }
 
-body {
-  background: #453942;
+html, body {
+  overflow: hidden;
+  height: 100vh;
   position: relative;
-  color: white;
-  font-family: 'Roboto', sans-serif;
 }
 
-body, html {
-  overflow: hidden !important;
+body {
+  background: #453942;
+  color: white;
+  font-family: 'Roboto', sans-serif;
 }
 
 .text-darker {
@@ -11379,7 +11376,7 @@ body, html {
 }
 
 .viewport-fit {
-  height: 100vh;
+  height: calc(100vh - 56px);
 }
 
 #message-form {

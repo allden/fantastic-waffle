@@ -8,24 +8,20 @@ $theme-colors: (
 
 @import "../../node_modules/bootstrap/scss/bootstrap.scss";
 
-
-html {
-    height: 100vh;
-}
-
 .text-support {
     color: map-get($theme-colors, support);
 }
 
-body {
-    background: map-get($theme-colors, darker);
+html, body {
+    overflow: hidden;
+    height: 100vh;
     position: relative;
-    color: white;
-    font-family: 'Roboto', sans-serif;
 }
 
-body, html {
-    overflow: hidden !important;
+body {
+    background: map-get($theme-colors, darker);
+    color: white;
+    font-family: 'Roboto', sans-serif;
 }
 
 .text-darker {
@@ -76,7 +72,7 @@ body, html {
 }
 
 .viewport-fit {
-    height: 100vh; 
+    height: calc(100vh - 56px); 
 }
 
 #message-form {
