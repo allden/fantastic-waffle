@@ -11419,7 +11419,11 @@ body {
           flex: 1;
 }
 
-@media (max-width: 575.98px) {
+.min-h-100 {
+  min-height: 75%;
+}
+
+@media (max-width: 768px) {
   .w-xs-100 {
     width: 100% !important;
   }

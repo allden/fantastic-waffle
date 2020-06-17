@@ -10,13 +10,14 @@ module.exports = (io) => {
             const disconnectedUser = users.filter(user => user.socket === socket.id)[0];
             
             // disconnect the user and pull them from the array
-            let stateChange = await userController.changeState(disconnectedUser.username, false)
-            .then(() => {
-                let filtered = users.filter(user => user.username !== disconnectedUser.username);
-                users = [...filtered];
-                console.log(users);
-                io.emit('stateChange');
-            });
+            if(disconnectedUser) {
+                let stateChange = await userController.changeState(disconnectedUser.username, false)
+                .then(() => {
+                    let filtered = users.filter(user => user.username !== disconnectedUser.username);
+                    users = [...filtered];                    
+                    io.emit('stateChange');
+                });
+            };
         });
         
         let room = '';
@@ -50,8 +51,7 @@ module.exports = (io) => {
 
         // meet people handlers
         socket.on('connectToChat', async userInfo => {
-            users.push(userInfo);
-            console.log(users);
+            users.push(userInfo);            
             // this needs to be in this specific event so that we can get the username easily from userInfo
             const unreadMessages = await privInstController.getAllUnreadConversations(userInfo.username).then(async unreads => {
                 const stateChange = await userController.changeState(userInfo.username, true)
@@ -119,8 +119,7 @@ module.exports = (io) => {
 
         socket.on('requestUserProfileData', async requestObj => {
             const userResponse = await userController.findSpecificUser(requestObj.requester, requestObj.target)
-            .then(userData => {
-                console.log(userData);
+            .then(userData => {                
                 socket.emit('requestUserProfileData', userData);
             })
             .catch(err => errHandling(err));

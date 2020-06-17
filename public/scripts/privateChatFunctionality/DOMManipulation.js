@@ -166,15 +166,17 @@ function createUserProfile(userObj) {
 
     let userInfoElement = document.createElement('p');
     userInfoElement.innerHTML=`
-        ${username} <span class="text-primary">/</span>
-        ${age} <span class="text-primary">/</span>
-        ${gender} <span class="text-primary">/</span> 
-        ${location}
+        ${username ? 
+            age ? username + ' <span class="text-primary">/</span> ' : username
+        : ''} 
+        ${age ? age + ' <span class="text-primary">/</span> ' : ''}
+        ${gender ? gender + ' <span class="text-primary">/</span> ' : ''}
+        ${location ? location : ''}
       `;
     userInfoElement.setAttribute('class', 'col-md-6 col-xs-12 p-0 mb-xs-3 m-0')
 
     // ulLeft
-    const aboutPara = createElementAndText('p', userObj.about);
+    const aboutPara = createElementAndText('p', userObj.about || "Let's be friends!");
 
     // DROPDOWN START
     let controlDiv = document.createElement('div');
@@ -290,13 +292,13 @@ function generatePersonCard(person) {
     // what will appear for each user
     const container = document.createElement('div');
     container.setAttribute('class', 'person p-3 btn btn-primary w-100 mb-3 text-light text-left');
-    const aboutElement = createElementAndText('p', about || 'Unset');
+    const aboutElement = createElementAndText('p', about || "Let's be friends!");
     const userInfoElement = document.createElement('p');
     userInfoElement.innerHTML = `
-        ${username} <span class="text-support">/</span> 
-        ${age} <span class="text-support">/</span> 
-        ${gender} <span class="text-support">/</span> 
-        ${location} <span class="text-support">/</span> 
+        ${username ? username + ' <span class="text-support">/</span> ' : ''} 
+        ${age ? age + ' <span class="text-support">/</span> ' : ''}
+        ${gender ? gender + ' <span class="text-support">/</span> ' : ''}
+        ${location ? location + ' <span class="text-support">/</span> ': ''}
         ${person.isOnline ? 'Online' : 'Offline'}
     `;
 
