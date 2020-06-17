@@ -125,7 +125,8 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUsersAsync = () => {
     return User.find({})
     .then(users => {
-        return users
+        const userDetails = filterData(users);
+        return userDetails
     })
     .catch(err => errHandling(err));
 };
@@ -134,7 +135,19 @@ module.exports.getFriendsListAsync = (username) => {
     return User.findOne({username})
     .populate('friendsList')
     .then(user => {
-        return user.friendsList
+        const filteredFriendsList = user.friendsList.map(friend => {
+            const {username, about, age, location, isOnline, gender} = friend;
+            return {
+                username,
+                about,
+                age,
+                gender,
+                location,
+                isOnline
+            };
+        });
+
+        return filteredFriendsList;
     })
     .catch(err => errHandling(err));
 };
@@ -177,15 +190,37 @@ module.exports.findSpecificUser = (requester, target) => {
         .then(foundRequester => {
             // i honestly could not think of a better way to change the button state between "add friend" and "remove friend",
             // you may have noticed this already, but this app is made with duct tape and determination
+            let userData = filterUserData(foundTarget.toObject());
             let isFriend = foundRequester.friendsList.includes(foundTarget._id);
             return {
                 isFriend,
-                ...foundTarget.toObject()
+                ...userData
             }
         })
         .catch(err => errHandling(err));
     })
     .catch(err => errHandling(err));
+};
+
+function filterData(users) {
+    const data = users.map(user => {
+        const {username, about, age, location, gender, isOnline} = user;
+        return {
+            username,
+            about,
+            age,
+            location,
+            gender,
+            isOnline
+        };
+    });
+
+    return data;
+};
+
+function filterUserData(user) {
+    const {password, friendsList, ...misc} = user;
+    return misc;
 };
 
 function errHandling(err) {

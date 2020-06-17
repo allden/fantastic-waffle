@@ -60,9 +60,9 @@ function appendMessage(msg, roomId) {
     .then(() => {
         // msg.toObject() is necessary because using the spread operator returns a document, rather than an object
         const data = {
-            msg: {...msg.toObject()},
+            msg: filterMessage({...msg.toObject()}),
             room: roomId
-        };
+        };        
         return data;
     })
     .catch(err => errHandling(err));
@@ -91,7 +91,13 @@ module.exports.getPrivateMessageHistory = (msgInfo) => {
                 // also make sure to pull the sender of the request from the unread array, as they've clearly seen the conversation
                 return PrivateInstance.findByIdAndUpdate({_id: found._id}, {$pull: {unread: sender}})
                 .then(() => {
-                    return found.messages;
+                    let foundMessages = [...found.messages];
+
+                    let filteredFound = foundMessages.map(message => {
+                        return filterMessage(message.toObject());
+                    });
+                    
+                    return filteredFound;
                 })
                 .catch(err => errHandling(err));
             };
@@ -128,6 +134,18 @@ module.exports.getAllUnreadConversations = (loggedInUser) => {
         .catch(err => errHandling(err));
     })
     .catch(err => errHandling(err));
+};
+
+function filterMessage(message) {
+    const messageCopy = {...message};
+    const filteredSender = filterUserData(messageCopy.sender);
+    messageCopy.sender = filteredSender;    
+    return messageCopy;
+}
+
+function filterUserData(user) {
+    const {password, friendsList, ...misc} = user;
+    return misc;
 };
 
 function errHandling(err) {
