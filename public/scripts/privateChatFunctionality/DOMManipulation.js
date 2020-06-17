@@ -48,7 +48,9 @@ function formatMessage(msg) {
     const infoDiv = document.createElement('div');
     infoDiv.setAttribute('class', 'd-flex align-items-center justify-content-between');
     const userHeader = createElementAndText('h3', sender);
+    userHeader.classList.add('p-0', 'm-0');
     const datePara = document.createElement('p');
+    datePara.classList.add('p-0', 'm-0');
     const fineDatePrint = createElementAndText('small', date);
     datePara.appendChild(fineDatePrint);
     const contentPara = createElementAndText('p', content);
@@ -155,18 +157,28 @@ function scrollToBottom(elem) {
 };
 
 function createUserProfile(userObj) {
+    const {username, age, gender, location} = userObj;
     // this is what appears below the message window
     // the purpose of this is to know who we are chatting with and also to give us the option to add them as a friend
     const userActionsDiv = document.createElement('div');
-    userActionsDiv.setAttribute('class', 'mb-3 row px-3');
+    userActionsDiv.setAttribute('class', 'mb-3 row px-3 align-items-center');
     clearProfile();
-    let ulLeft = document.createElement('ul');
-    ulLeft.setAttribute('class', 'list-unstyled d-flex p-0 m-0 col-6')
+
+    let userInfoElement = document.createElement('p');
+    userInfoElement.innerHTML=`
+        ${username} <span class="text-primary">/</span>
+        ${age} <span class="text-primary">/</span>
+        ${gender} <span class="text-primary">/</span> 
+        ${location}
+      `;
+    userInfoElement.setAttribute('class', 'col-md-6 col-xs-12 p-0 mb-xs-3 m-0')
+
+    // ulLeft
     const aboutPara = createElementAndText('p', userObj.about);
 
     // DROPDOWN START
     let controlDiv = document.createElement('div');
-    controlDiv.setAttribute('class', 'col-6 d-flex justify-content-end');
+    controlDiv.setAttribute('class', 'col-md-6 col-xs-12 d-flex justify-content-end justify-content-xs-start p-0 m-0');
     // dropdown btn
     const dropdown = createElementAndText('button', 'Options');
     dropdown.setAttribute('class', 'dropdown-toggle btn btn-complement')
@@ -198,22 +210,8 @@ function createUserProfile(userObj) {
 
     // DROPDOWN END
 
-    let ulLeftContent = [
-        createElementAndText('li', userObj.username),    
-        createElementAndText('li', userObj.age),    
-        createElementAndText('li', userObj.gender),    
-        createElementAndText('li', userObj.location)    
-    ];
-
-    ulLeftContent.forEach(item => {
-        item.setAttribute('class', 'mr-3');
-    });
-
-    let docFragLeft = createDocumentFragment(ulLeftContent);
-    ulLeft.appendChild(docFragLeft);
-
     let userActionsContent = [
-        ulLeft,
+        userInfoElement,
         controlDiv
     ];
 
@@ -263,16 +261,7 @@ function removeCurrentFromAll() {
 };
 
 // this is the actual event for the "person" class, which returns the message history with the selected user
-function personEvent(e) {
-    const targetChildren = e.currentTarget.children;
-    const info = targetChildren[0].children;
-    const userObj = {
-        username: info[0].textContent,
-        age: info[1].textContent,
-        gender: info[2].textContent,
-        location: info[3].textContent,
-        about: targetChildren[1].textContent
-    };
+function personEvent(userObj) {
     
     const activeElement = checkIfActiveConversationBlockExists(userObj.username);
     
@@ -297,42 +286,34 @@ function personEvent(e) {
 };
 
 function generatePersonCard(person) {
+    const {username, age, gender, location, about} = person;
     // what will appear for each user
     const container = document.createElement('div');
     container.setAttribute('class', 'person p-3 btn btn-primary w-100 mb-3 text-light text-left');
-    const about = createElementAndText('p', person.about || 'Unset');
-    const unorderedList = document.createElement('ul');
-    unorderedList.setAttribute('class', 'list-unstyled d-flex');
-    const listItems = [
-        createElementAndText('li', person.username),
-        createElementAndText('li', person.age || 'Unset'),
-        createElementAndText('li', person.gender || 'Unset'),
-        createElementAndText('li', person.location || 'Unset'),
-        createElementAndText('li', person.isOnline ? 'Online' : 'Offline')
-    ];
+    const aboutElement = createElementAndText('p', about || 'Unset');
+    const userInfoElement = document.createElement('p');
+    userInfoElement.innerHTML = `
+        ${username} <span class="text-support">/</span> 
+        ${age} <span class="text-support">/</span> 
+        ${gender} <span class="text-support">/</span> 
+        ${location} <span class="text-support">/</span> 
+        ${person.isOnline ? 'Online' : 'Offline'}
+    `;
 
-    listItems.forEach(item => {
-        item.setAttribute('class', 'pr-4');
-    });
-
-    // append multiple children at once
-    const docFrag = createDocumentFragment(listItems);
-
-    // append to ul
-    unorderedList.appendChild(docFrag);
     // append to our container
-    container.appendChild(unorderedList);
-    container.appendChild(about);
+    container.appendChild(userInfoElement);
+    container.appendChild(aboutElement);
 
-    container.addEventListener('click', personEvent);
+    container.addEventListener('click', () => personEvent(person));
 
     return container
 };
 
 // utility class to create elements with text inside
-function createElementAndText(type, text) {
+function createElementAndText(type, text, classList='') {
     const element = document.createElement(type);
     const textNode = document.createTextNode(text);
+    element.setAttribute('class', classList);
     element.appendChild(textNode);
     return element;
 };

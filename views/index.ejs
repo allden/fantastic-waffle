@@ -7,7 +7,7 @@
     <body>
         <%- include('partials/nav'); %>
         <div class="container-fluid d-flex flex-row align-items-center justify-content-center viewport-fit">
-            <div class="jumbotron bg-complement text-center w-75">
+            <div class="jumbotron bg-complement text-center w-75 w-xs-100">
                 <%- include('partials/messages'); %>
                 <h1><%= user ? `Welcome, ${user.username}` : 'Welcome!'%></h1>
                 <p class="lead">This website is for websocket testing purposes.</p>
