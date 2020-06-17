@@ -11326,10 +11326,6 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
-body.keyboard {
-  height: calc(100vh + 500px) !important;
-}
-
 .text-darker {
   color: #453942;
 }
@@ -11384,8 +11380,7 @@ body.keyboard {
 }
 
 #message-form {
-  top: 75%;
-  bottom: 0;
+  top: 0;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;

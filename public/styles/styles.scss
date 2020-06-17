@@ -24,10 +24,6 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
-body.keyboard {
-    height: calc(100vh + 500px) !important;
-}
-
 .text-darker {
     color: map-get($theme-colors, darker);
 }
@@ -80,8 +76,7 @@ body.keyboard {
 }
 
 #message-form {
-    top: 75%;
-    bottom: 0;
+    top: 0;
     display: flex;
     flex-direction: column;
 }
